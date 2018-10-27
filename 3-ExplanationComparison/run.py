@@ -19,7 +19,7 @@ from sklearn.svm import SVR
 
 # Code imports
 import sys
-sys.path.insert(0, "/media/gregory/HDD/Projects/MAPLE/Code/")
+sys.path.insert(0, "/home/gregory/Desktop/MAPLE/Code/")
 
 from MAPLE import MAPLE
 from Misc import load_normalize_data, unpack_coefs
@@ -71,9 +71,6 @@ def run(args):
     n = X_test.shape[0]
     d = X_test.shape[1]
     
-    # Load the noise scale parameters -> used to cover a percentage of the feature ranges
-    #with open("../NeighborhoodScales/Scales/" + dataset + "_range.json", "r") as tmp:
-    #    ranges = np.asarray(json.load(tmp))
     scales = [0.1, 0.25]
     scales_len = len(scales)
         
@@ -99,13 +96,12 @@ def run(args):
         
         for j in range(num_perturbations):
             
-            #noise = 0.5 * np.random.uniform(low = -1.0, high = 1.0, size = d)
             noise = np.random.normal(loc = 0.0, scale = 1.0, size = d)
             
             for k in range(scales_len):
                 scale = scales[k]
             
-                x_pert = x + scale * ranges * noise
+                x_pert = x + scale * noise
             
                 model_pred = model.predict(x_pert.reshape(1,-1))
                 lime_pred = np.dot(np.insert(x_pert, 0, 1), coefs_lime)
@@ -122,8 +118,8 @@ def run(args):
 
     out["lime_rmse_0.1"] = lime_rmse[0]
     out["maple_rmse_0.1"] = maple_rmse[0]
-    out["lime_rmse_0.2"] = lime_rmse[1]
-    out["maple_rmse_0.2"] = maple_rmse[1]
+    out["lime_rmse_0.25"] = lime_rmse[1]
+    out["maple_rmse_0.25"] = maple_rmse[1]
 
     json.dump(out, file)
     file.close()
@@ -174,7 +170,7 @@ for dataset in datasets:
             df.ix[dataset, name].append(data[name])
 
     file.write(dataset + "\n")
-    file.write("Percent = 0.1: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.1"],df.ix[dataset, "maple_rmse_0.1"], equal_var = False).pvalue) + "\n")
-    file.write("Percent = 0.2: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.2"],df.ix[dataset, "maple_rmse_0.2"], equal_var = False).pvalue) + "\n")
+    file.write("Sigma = 0.1: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.1"],df.ix[dataset, "maple_rmse_0.1"], equal_var = False).pvalue) + "\n")
+    file.write("Sigma = 0.25: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.25"],df.ix[dataset, "maple_rmse_0.25"], equal_var = False).pvalue) + "\n")
 
 file.close()

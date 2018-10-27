@@ -1,9 +1,0 @@
-"Dataset","Dimension","Num Features RF","Num Features GBRT"
-"autompgs",8,6.44,5.94
-"communities",103,54.14,50.12
-"crimes",103,20.34,21.62
-"day",15,2.46,3.02
-"happiness",8,7.74,7.46
-"housing",12,9.98,10.06
-"music",70,5.56,14.46
-"winequality-red",12,7.1,6.88

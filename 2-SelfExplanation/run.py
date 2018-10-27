@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 
 # Code imports
 import sys
-sys.path.insert(0, "/media/gregory/HDD/Projects/MAPLE/Code/")
+sys.path.insert(0, "/home/gregory/Desktop/MAPLE/Code/")
 
 from MAPLE import MAPLE
 from Misc import load_normalize_data, unpack_coefs

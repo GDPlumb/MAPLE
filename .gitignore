@@ -1,0 +1,9 @@
+*.AppleDouble
+*__pycache__
+
+*.json
+*.txt
+*.csv
+
+PotentialFutureWork/*
+

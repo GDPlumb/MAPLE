@@ -17,7 +17,7 @@ from sklearn.metrics import mean_squared_error
 
 # Code imports
 import sys
-sys.path.insert(0, "/media/gregory/HDD/Projects/MAPLE/Code/")
+sys.path.insert(0, "/home/gregory/Desktop/MAPLE/Code/")
 from MAPLE import MAPLE
 from Misc import load_normalize_data
 
