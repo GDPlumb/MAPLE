@@ -16,9 +16,9 @@ from sklearn.model_selection import train_test_split
 
 # Code imports
 import sys
-sys.path.insert(0, "/media/gregory/HDD/Projects/SLIM/Code/")
+sys.path.insert(0, "/media/gregory/HDD/Projects/MAPLE/Code/")
 
-from SLIM import SLIM
+from MAPLE import MAPLE
 from Misc import load_normalize_data, unpack_coefs
 
 from lime import lime_tabular
@@ -59,14 +59,14 @@ def run(args):
     scales = [0.1, 0.25]
     scales_len = len(scales)
         
-    # Fit SLIM model
-    exp_slim = SLIM(X_train, y_train, X_valid, y_valid)
+    # Fit MAPLE model
+    exp_slim = MAPLE(X_train, y_train, X_valid, y_valid)
     
-    # Fit LIME to explain SLIM
+    # Fit LIME to explain MAPLE
     exp_lime = lime_tabular.LimeTabularExplainer(X_train, discretize_continuous=False, mode="regression")
 
     # Evaluate model faithfullness on the test set
-    rmse = 0.0 #SLIM accuracy on the dataset
+    rmse = 0.0 #MAPLE accuracy on the dataset
     lime_rmse = np.zeros((scales_len))
     slim_rmse = np.zeros((scales_len))
     for i in range(n):
@@ -74,7 +74,7 @@ def run(args):
         
         #LIME's default parameter for num_samples is 500
         # 1) This is larger than any of the datasets we tested on
-        # 2) It makes explaining SLIM impractically slow since the complexity of SLIM's predict() depends on the dataset size
+        # 2) It makes explaining MAPLE impractically slow since the complexity of MAPLE's predict() depends on the dataset size
         coefs_lime = unpack_coefs(exp_lime, x, exp_slim.predict, d, X_train, num_samples = 100)
         
         e_slim = exp_slim.explain(x)

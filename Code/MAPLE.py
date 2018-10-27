@@ -1,13 +1,13 @@
 # Notes:
 # -  Assumes any required data normalization has already been done
-# -  Can pass Y (desired response) instead of MR (model fit to Y) to make fitting SLIM to datasets easy
+# -  Can pass Y (desired response) instead of MR (model fit to Y) to make fitting MAPLE to datasets easy
 
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 import numpy as np
 
-class SLIM:
+class MAPLE:
  
     def __init__(self, X_train, MR_train, X_val, MR_val, fe_type = "rf", n_estimators = 200, max_features = 0.5, min_samples_leaf = 10, regularization = 0.001):
         
@@ -64,7 +64,7 @@ class SLIM:
         self.feature_scores = scores
         mostImpFeats = np.argsort(-scores)
                 
-        # Find the number of features to use for SLIM
+        # Find the number of features to use for MAPLE
         retain_best = 0
         rmse_best = np.inf
         for retain in range(1, num_features + 1):
@@ -138,15 +138,15 @@ class SLIM:
             pred[i] = exp["pred"][0]
         return pred
 
-    # Make the predictions based on the forest ensemble (either random forest or gradient boosted regression tree) instead of SLIM
+    # Make the predictions based on the forest ensemble (either random forest or gradient boosted regression tree) instead of MAPLE
     def predict_fe(self, X):
         return self.fe.predict(X)
 
-    # Make the predictions based on SILO (no feature selection) instead of SLIM
+    # Make the predictions based on SILO (no feature selection) instead of MAPLE
     def predict_silo(self, X):
         n = X.shape[0]
         pred = np.zeros(n)
-        for i in range(n): #The contents of this inner loop are similar to explain(): doesn't use the features selected by SLIM or return as much information
+        for i in range(n): #The contents of this inner loop are similar to explain(): doesn't use the features selected by MAPLE or return as much information
             x = X[i, :].reshape(1, -1)
         
             curr_leaf_ids = self.fe.apply(x)[0]

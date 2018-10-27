@@ -17,8 +17,8 @@ from sklearn.metrics import mean_squared_error
 
 # Code imports
 import sys
-sys.path.insert(0, "/media/gregory/HDD/Projects/SLIM/Code/")
-from SLIM import SLIM
+sys.path.insert(0, "/media/gregory/HDD/Projects/MAPLE/Code/")
+from MAPLE import MAPLE
 from Misc import load_normalize_data
 
 ###
@@ -54,7 +54,7 @@ def run(args):
     out["lm_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
 
     # RF
-    slim_rf = SLIM(X_train, y_train, X_val, y_val)
+    slim_rf = MAPLE(X_train, y_train, X_val, y_val)
 
     predictions = slim_rf.predict_fe(X_test)
     out["rf_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
@@ -67,7 +67,7 @@ def run(args):
     out["nf_rf"] = slim_rf.retain
 
     # GBRT
-    slim_gbrt = SLIM(X_train, y_train, X_val, y_val, fe_type = "gbrt")
+    slim_gbrt = MAPLE(X_train, y_train, X_val, y_val, fe_type = "gbrt")
 
     predictions = slim_gbrt.predict_fe(X_test)
     out["gbrt_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
@@ -126,9 +126,9 @@ for dataset in datasets:
             df.ix[dataset, name].append(data[name])
 
     file.write(dataset + "\n")
-    file.write("SLIM vs RF: " + str(stats.ttest_ind(df.ix[dataset, "rf_rmse"],df.ix[dataset, "slim_rf_rmse"], equal_var = False).pvalue) + "\n")
-    file.write("SLIM vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "slim_rf_rmse"],df.ix[dataset, "silo_rf_rmse"], equal_var = False).pvalue) + "\n")
-    file.write("SLIM vs GBRT: " + str(stats.ttest_ind(df.ix[dataset, "gbrt_rmse"],df.ix[dataset, "slim_gbrt_rmse"], equal_var = False).pvalue) + "\n")
-    file.write("SLIM vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "slim_gbrt_rmse"],df.ix[dataset, "silo_gbrt_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs RF: " + str(stats.ttest_ind(df.ix[dataset, "rf_rmse"],df.ix[dataset, "slim_rf_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "slim_rf_rmse"],df.ix[dataset, "silo_rf_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs GBRT: " + str(stats.ttest_ind(df.ix[dataset, "gbrt_rmse"],df.ix[dataset, "slim_gbrt_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "slim_gbrt_rmse"],df.ix[dataset, "silo_gbrt_rmse"], equal_var = False).pvalue) + "\n")
 
 file.close()

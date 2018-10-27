@@ -19,9 +19,9 @@ from sklearn.svm import SVR
 
 # Code imports
 import sys
-sys.path.insert(0, "/media/gregory/HDD/Projects/SLIM/Code/")
+sys.path.insert(0, "/media/gregory/HDD/Projects/MAPLE/Code/")
 
-from SLIM import SLIM
+from MAPLE import MAPLE
 from Misc import load_normalize_data, unpack_coefs
 
 from lime import lime_tabular
@@ -81,9 +81,9 @@ def run(args):
     model = fit_svr(X_train, y_train, X_test, y_test)
     out["model_rmse"] = np.sqrt(np.mean((y_test - model.predict(X_test))**2))
         
-    # Fit LIME and SLIM explainers to the model
+    # Fit LIME and MAPLE explainers to the model
     exp_lime = lime_tabular.LimeTabularExplainer(X_train, discretize_continuous=False, mode="regression")
-    exp_slim = SLIM(X_train, model.predict(X_train), X_valid, model.predict(X_valid))
+    exp_slim = MAPLE(X_train, model.predict(X_train), X_valid, model.predict(X_valid))
         
     # Evaluate model faithfullness on the test set
     lime_rmse = np.zeros((scales_len))
