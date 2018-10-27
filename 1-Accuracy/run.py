@@ -54,30 +54,30 @@ def run(args):
     out["lm_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
 
     # RF
-    slim_rf = MAPLE(X_train, y_train, X_val, y_val)
+    maple_rf = MAPLE(X_train, y_train, X_val, y_val)
 
-    predictions = slim_rf.predict_fe(X_test)
+    predictions = maple_rf.predict_fe(X_test)
     out["rf_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
 
-    predictions = slim_rf.predict_silo(X_test)
+    predictions = maple_rf.predict_silo(X_test)
     out["silo_rf_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
 
-    predictions = slim_rf.predict(X_test)
-    out["slim_rf_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
-    out["nf_rf"] = slim_rf.retain
+    predictions = maple_rf.predict(X_test)
+    out["maple_rf_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
+    out["nf_rf"] = maple_rf.retain
 
     # GBRT
-    slim_gbrt = MAPLE(X_train, y_train, X_val, y_val, fe_type = "gbrt")
+    maple_gbrt = MAPLE(X_train, y_train, X_val, y_val, fe_type = "gbrt")
 
-    predictions = slim_gbrt.predict_fe(X_test)
+    predictions = maple_gbrt.predict_fe(X_test)
     out["gbrt_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
 
-    predictions = slim_gbrt.predict_silo(X_test)
+    predictions = maple_gbrt.predict_silo(X_test)
     out["silo_gbrt_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
     
-    predictions = slim_gbrt.predict(X_test)
-    out["slim_gbrt_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
-    out["nf_gbrt"] = slim_gbrt.retain
+    predictions = maple_gbrt.predict(X_test)
+    out["maple_gbrt_rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
+    out["nf_gbrt"] = maple_gbrt.retain
 
     # Save results
     json.dump(out, file)
@@ -126,9 +126,9 @@ for dataset in datasets:
             df.ix[dataset, name].append(data[name])
 
     file.write(dataset + "\n")
-    file.write("MAPLE vs RF: " + str(stats.ttest_ind(df.ix[dataset, "rf_rmse"],df.ix[dataset, "slim_rf_rmse"], equal_var = False).pvalue) + "\n")
-    file.write("MAPLE vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "slim_rf_rmse"],df.ix[dataset, "silo_rf_rmse"], equal_var = False).pvalue) + "\n")
-    file.write("MAPLE vs GBRT: " + str(stats.ttest_ind(df.ix[dataset, "gbrt_rmse"],df.ix[dataset, "slim_gbrt_rmse"], equal_var = False).pvalue) + "\n")
-    file.write("MAPLE vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "slim_gbrt_rmse"],df.ix[dataset, "silo_gbrt_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs RF: " + str(stats.ttest_ind(df.ix[dataset, "rf_rmse"],df.ix[dataset, "maple_rf_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "maple_rf_rmse"],df.ix[dataset, "silo_rf_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs GBRT: " + str(stats.ttest_ind(df.ix[dataset, "gbrt_rmse"],df.ix[dataset, "maple_gbrt_rmse"], equal_var = False).pvalue) + "\n")
+    file.write("MAPLE vs SILO: " + str(stats.ttest_ind(df.ix[dataset, "maple_gbrt_rmse"],df.ix[dataset, "silo_gbrt_rmse"], equal_var = False).pvalue) + "\n")
 
 file.close()

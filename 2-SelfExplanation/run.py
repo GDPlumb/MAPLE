@@ -60,7 +60,7 @@ def run(args):
     scales_len = len(scales)
         
     # Fit MAPLE model
-    exp_slim = MAPLE(X_train, y_train, X_valid, y_valid)
+    exp_maple = MAPLE(X_train, y_train, X_valid, y_valid)
     
     # Fit LIME to explain MAPLE
     exp_lime = lime_tabular.LimeTabularExplainer(X_train, discretize_continuous=False, mode="regression")
@@ -68,19 +68,19 @@ def run(args):
     # Evaluate model faithfullness on the test set
     rmse = 0.0 #MAPLE accuracy on the dataset
     lime_rmse = np.zeros((scales_len))
-    slim_rmse = np.zeros((scales_len))
+    maple_rmse = np.zeros((scales_len))
     for i in range(n):
         x = X_test[i, :]
         
         #LIME's default parameter for num_samples is 500
         # 1) This is larger than any of the datasets we tested on
         # 2) It makes explaining MAPLE impractically slow since the complexity of MAPLE's predict() depends on the dataset size
-        coefs_lime = unpack_coefs(exp_lime, x, exp_slim.predict, d, X_train, num_samples = 100)
+        coefs_lime = unpack_coefs(exp_lime, x, exp_maple.predict, d, X_train, num_samples = 100)
         
-        e_slim = exp_slim.explain(x)
-        coefs_slim = e_slim["coefs"]
+        e_maple = exp_maple.explain(x)
+        coefs_maple = e_maple["coefs"]
         
-        rmse += (e_slim["pred"] - y_test[i])**2
+        rmse += (e_maple["pred"] - y_test[i])**2
         
         for j in range(num_perturbations):
             
@@ -91,27 +91,27 @@ def run(args):
 
                 x_pert = x + scale * noise
             
-                e_slim_pert = exp_slim.explain(x_pert)
-                model_pred = e_slim_pert["pred"]
+                e_maple_pert = exp_maple.explain(x_pert)
+                model_pred = e_maple_pert["pred"]
                 lime_pred = np.dot(np.insert(x_pert, 0, 1), coefs_lime)
-                slim_pred = np.dot(np.insert(x_pert, 0, 1), coefs_slim)
+                maple_pred = np.dot(np.insert(x_pert, 0, 1), coefs_maple)
 
                 lime_rmse[k] += (lime_pred - model_pred)**2
-                slim_rmse[k] += (slim_pred - model_pred)**2
+                maple_rmse[k] += (maple_pred - model_pred)**2
 
     rmse /= n
     lime_rmse /= n * num_perturbations
-    slim_rmse /= n * num_perturbations
+    maple_rmse /= n * num_perturbations
 
     rmse = np.sqrt(rmse)
     lime_rmse = np.sqrt(lime_rmse)
-    slim_rmse = np.sqrt(slim_rmse)
+    maple_rmse = np.sqrt(maple_rmse)
     
     out["model_rmse"] = rmse[0]
     out["lime_rmse_0.1"] = lime_rmse[0]
-    out["slim_rmse_0.1"] = slim_rmse[0]
+    out["maple_rmse_0.1"] = maple_rmse[0]
     out["lime_rmse_0.25"] = lime_rmse[1]
-    out["slim_rmse_0.25"] = slim_rmse[1]
+    out["maple_rmse_0.25"] = maple_rmse[1]
 
     json.dump(out, file)
     file.close()
@@ -162,7 +162,7 @@ for dataset in datasets:
             df.ix[dataset, name].append(data[name])
 
     file.write(dataset + "\n")
-    file.write("Sigma = 0.1: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.1"],df.ix[dataset, "slim_rmse_0.1"], equal_var = False).pvalue) + "\n")
-    file.write("Sigma = 0.25: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.25"],df.ix[dataset, "slim_rmse_0.25"], equal_var = False).pvalue) + "\n")
+    file.write("Sigma = 0.1: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.1"],df.ix[dataset, "maple_rmse_0.1"], equal_var = False).pvalue) + "\n")
+    file.write("Sigma = 0.25: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.25"],df.ix[dataset, "maple_rmse_0.25"], equal_var = False).pvalue) + "\n")
 
 file.close()

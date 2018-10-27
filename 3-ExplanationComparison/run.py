@@ -83,19 +83,19 @@ def run(args):
         
     # Fit LIME and MAPLE explainers to the model
     exp_lime = lime_tabular.LimeTabularExplainer(X_train, discretize_continuous=False, mode="regression")
-    exp_slim = MAPLE(X_train, model.predict(X_train), X_valid, model.predict(X_valid))
+    exp_maple = MAPLE(X_train, model.predict(X_train), X_valid, model.predict(X_valid))
         
     # Evaluate model faithfullness on the test set
     lime_rmse = np.zeros((scales_len))
-    slim_rmse = np.zeros((scales_len))
+    maple_rmse = np.zeros((scales_len))
     
     for i in range(n):
         x = X_test[i, :]
         
         coefs_lime = unpack_coefs(exp_lime, x, model.predict, d, X_train) #Allow full number of features
     
-        e_slim = exp_slim.explain(x)
-        coefs_slim = e_slim["coefs"]
+        e_maple = exp_maple.explain(x)
+        coefs_maple = e_maple["coefs"]
         
         for j in range(num_perturbations):
             
@@ -109,21 +109,21 @@ def run(args):
             
                 model_pred = model.predict(x_pert.reshape(1,-1))
                 lime_pred = np.dot(np.insert(x_pert, 0, 1), coefs_lime)
-                slim_pred = np.dot(np.insert(x_pert, 0, 1), coefs_slim)
+                maple_pred = np.dot(np.insert(x_pert, 0, 1), coefs_maple)
             
                 lime_rmse[k] += (lime_pred - model_pred)**2
-                slim_rmse[k] += (slim_pred - model_pred)**2
+                maple_rmse[k] += (maple_pred - model_pred)**2
 
     lime_rmse /= n * num_perturbations
-    slim_rmse /= n * num_perturbations
+    maple_rmse /= n * num_perturbations
 
     lime_rmse = np.sqrt(lime_rmse)
-    slim_rmse = np.sqrt(slim_rmse)
+    maple_rmse = np.sqrt(maple_rmse)
 
     out["lime_rmse_0.1"] = lime_rmse[0]
-    out["slim_rmse_0.1"] = slim_rmse[0]
+    out["maple_rmse_0.1"] = maple_rmse[0]
     out["lime_rmse_0.2"] = lime_rmse[1]
-    out["slim_rmse_0.2"] = slim_rmse[1]
+    out["maple_rmse_0.2"] = maple_rmse[1]
 
     json.dump(out, file)
     file.close()
@@ -174,7 +174,7 @@ for dataset in datasets:
             df.ix[dataset, name].append(data[name])
 
     file.write(dataset + "\n")
-    file.write("Percent = 0.1: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.1"],df.ix[dataset, "slim_rmse_0.1"], equal_var = False).pvalue) + "\n")
-    file.write("Percent = 0.2: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.2"],df.ix[dataset, "slim_rmse_0.2"], equal_var = False).pvalue) + "\n")
+    file.write("Percent = 0.1: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.1"],df.ix[dataset, "maple_rmse_0.1"], equal_var = False).pvalue) + "\n")
+    file.write("Percent = 0.2: " + str(stats.ttest_ind(df.ix[dataset, "lime_rmse_0.2"],df.ix[dataset, "maple_rmse_0.2"], equal_var = False).pvalue) + "\n")
 
 file.close()
